@@ -24,6 +24,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -43,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private String[][] techList;
     private IntentFilter[] intentFilters;
     private Tag tag;
+    private TextView report;
+    private String message = "";
     private int sdkVersion;
     public static final String TXT_FILEPATH = Environment.getExternalStorageDirectory().getPath() + "/files/";
     /**
@@ -59,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setContentView(R.layout.activity_main);
+        report=(TextView)findViewById(R.id.textView);
+        report.setText(String.format("%s", message));
+
 
         // 支持nfc tag所有的标准
         techList = new String[][] { new String[] { android.nfc.tech.NfcV.class.getName() }, new String[] { android.nfc.tech.NfcF.class.getName() }, new String[] { android.nfc.tech.NfcA.class.getName() }, new String[] { android.nfc.tech.NfcB.class.getName() }, new String[] { android.nfc.tech.Ndef.class.getName() }, new String[] { android.nfc.tech.NdefFormatable.class.getName() }, new String[] { android.nfc.tech.MifareClassic.class.getName() }, new String[] { android.nfc.tech.MifareUltralight.class.getName() } };
@@ -195,14 +201,15 @@ public class MainActivity extends AppCompatActivity {
     private void tagShowMethodAPI19(final Tag tag){
         // 获取Tag对象后读取里面的信息
         String tagInfo = getTagInfoAPI19(tag);
+        message = tagInfo;
         Log.e("nfc", "tagInfo === api19 ==" + tagInfo);
-        if (!TextUtils.isEmpty(tagInfo)) {
-
-            Date curDate = new Date();
-            String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS", Locale.CHINA).format(curDate);
-            writeToTxt(tagInfo, dateStr);
-
-        }
+//        if (!TextUtils.isEmpty(tagInfo)) {
+//
+//            Date curDate = new Date();
+//            String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS", Locale.CHINA).format(curDate);
+//            writeToTxt(tagInfo, dateStr);
+//
+//        }
     }
 
 
@@ -214,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
         FileOutputStream fos = null;
         try {
             File file = new File(TXT_FILEPATH + fileName);
-            Toast.makeText(this, TXT_FILEPATH + fileName, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "请在系统设置中先启用NFC功能", Toast.LENGTH_SHORT).show();
             // 如果文件不存在，则创建文件
             if (!file.exists()) {
                 if (!file.getParentFile().exists()) {
