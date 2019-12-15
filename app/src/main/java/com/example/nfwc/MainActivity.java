@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private String[][] techList;
     private IntentFilter[] intentFilters;
     private Tag tag;
+    private Intent intent;
     private TextView report;
     private String message = "";
     private int sdkVersion;
@@ -75,6 +76,11 @@ public class MainActivity extends AppCompatActivity {
         openNfcManager();
 
         sdkVersion = Build.VERSION.SDK_INT;
+
+        //启动后台服务
+        setContentView(R.layout.activity_main);
+        intent = new Intent(this, PlayerService.class);
+        startService(intent);
 
     }
 
@@ -177,6 +183,10 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         mNfcAdapter = null;
         this.finish();
+
+        //在退出Activity时停止该服务
+        super.onDestroy();
+        stopService(intent);
 
     }
 
