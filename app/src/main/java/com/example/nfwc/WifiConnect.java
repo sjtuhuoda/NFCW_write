@@ -35,7 +35,7 @@ public class WifiConnect {
     public WifiConnect(Context context){
         mContext=context;
         mWifiManager = context==null ? null : (WifiManager)context.getApplicationContext().getSystemService(context.WIFI_SERVICE);
-        receiver=new WifiBroadcastReceiver(mContext,mWifiManager);
+        //receiver=new WifiBroadcastReceiver(mContext,mWifiManager);
         OpenWifi();
     }
 
@@ -52,6 +52,9 @@ public class WifiConnect {
     public String Connect(String targetSSID,String password){
         targetSSID="\""+targetSSID+"\"";
         password="\""+password+"\"";
+        try {
+            Thread.sleep(5000);
+        }catch (Exception e){e.printStackTrace();}
         scanResults=receiver.scanResults;
         ScanResult targetWifi=findWifiBySSID(targetSSID);
         int netId=findInConfiguration(targetWifi);

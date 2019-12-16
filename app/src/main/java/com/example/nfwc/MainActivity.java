@@ -2,6 +2,7 @@ package com.example.nfwc;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
@@ -23,7 +24,9 @@ import android.os.Parcelable;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,9 +37,14 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
+
+public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks{
 
     /** Called when the activity is first created. */
     private NfcAdapter mNfcAdapter;
@@ -49,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
     private String message = "";
     private int sdkVersion;
     public static final String TXT_FILEPATH = Environment.getExternalStorageDirectory().getPath() + "/files/";
+    private WifiBroadcastReceiver wifiConnect;
+    private Button testButton;
+    private final int REQUEST_CODE=998;
     /**
      * 开始的生命周期:onCreate-->onStart-->OnResume
      * 从此页面跳转至详细页面：onPause-->OnStop , OnRestart-->OnStart -->OnResume
@@ -81,6 +92,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         intent = new Intent(this, PlayerService.class);
         startService(intent);
+
+        wifiConnect=new WifiBroadcastReceiver(MainActivity.this);
+        testButton=findViewById(R.id.testButton);
+        testButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String res=wifiConnect.Connect("恶龙咆哮","Awwwwww");
+                Log.d("connect",res);
+            }
+        });
+        requestPermission();
+
 
     }
 
@@ -440,5 +463,57 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return tagInfo;
+    }
+
+    /*Copyright 2017 Google
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+    //check location permission
+    //if not allowed,request them
+    @AfterPermissionGranted(REQUEST_CODE)
+    private void requestPermission(){
+        String[] perms={Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION};
+        if(EasyPermissions.hasPermissions(this,perms)){
+            Log.d("permissions","has granted");
+            return;
+        }
+        else{
+            EasyPermissions.requestPermissions(this,"需要获取位置信息权限",REQUEST_CODE,perms);
+            Log.d("permissions","request");
+            return;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+        Log.d("permission","request successfully");
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+        Log.d("permission","request denied");
+        // (Optional) Check whether the user denied any permissions and checked "NEVER ASK AGAIN."
+        // This will display a dialog directing them to enable the permission in app settings.
+        new AppSettingsDialog.Builder(this).build().show();
     }
 }
