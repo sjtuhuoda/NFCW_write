@@ -227,4 +227,8 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
         }
         Log.d("remove network","cannot find this SSID");
     }
+
+    public void unregisterReceiver(){
+        receiverContext.unregisterReceiver(this);
+    }
 }
