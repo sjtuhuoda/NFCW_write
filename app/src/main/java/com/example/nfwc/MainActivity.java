@@ -84,15 +84,22 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
         tagDetected.addCategory(Intent.CATEGORY_DEFAULT);
         writeTagFilters = new IntentFilter[] { tagDetected };
-        Log.e("test","bbb");
         requestPermission();
+
+        //启动后台服务
+        setContentView(R.layout.activity_main);
+        intent = new Intent(this, PlayerService.class);
+        startService(intent);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         wifiConnect.unregisterReceiver();
+        stopService(intent);
     }
+
+
 
     /******************************************************************************
      **********************************Read From NFC Tag***************************
