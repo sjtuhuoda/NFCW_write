@@ -90,6 +90,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         setContentView(R.layout.activity_main);
         intent = new Intent(this, PlayerService.class);
         startService(intent);
+
+        testButton=findViewById(R.id.testButton);
+        testButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                contact.addContact("aaa","15210118288");
+            }
+        });
     }
 
     @Override
@@ -122,7 +130,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             if(TextUtils.equals(n_text.split("[\n]")[0],"wifi")){
                 String returns = wifiConnect.Connect(n_text.split("[\n]")[1], n_text.split("[\n]")[2]);
                 Log.e("connect", returns);
-            }else if(TextUtils.equals(n_text.split("[\n]")[0],"card")){}
+            }
+            else if(TextUtils.equals(n_text.split("[\n]")[0],"card")){
+                contact.addContact(n_text.split("[\n]")[1], n_text.split("[\n]")[2]);
+            }
         }
     }
     private String buildTagViews(NdefMessage[] msgs) {
